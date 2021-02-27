@@ -1,13 +1,11 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import twint
-
-#quotefile = open('quotes.txt','r')
-#linelist = quotefile.read().split('\n') 
-#quotefile.close()
+import re
 
 TOKEN=""
 CHATID=123
 oldtweetid = 123
+
 def callbacktweet(context: CallbackContext): 
    global oldtweetid
    tweets = [] 
@@ -17,14 +15,13 @@ def callbacktweet(context: CallbackContext):
    t.Limit = 1
    t.Filter_retweets = False
    t.Store_object = True
-   tweets = []
    t.Store_object_tweets_list = tweets
    twint.run.Search(t)
    newtweet = tweets[0]
    #check if the latest tweet it hasn't been reported yet and exclude the tweet replies @
    if(newtweet.id != oldtweetid and newtweet.tweet[0] != '@'):
       if (len(newtweet.photos) > 0): 
-         #erase the link that store the photos from the text
+         #erase the link that store the photos from the tweet text
          newtweet.tweet = re.sub(r'(https:\/\/t\.co\/..........)','',newtweet.tweet) 
          if(len(newtweet.tweet) > 1): context.bot.send_message(chat_id=CHATID, text=newtweet.tweet)
          for imageurl in newtweet.photos:
