@@ -1,17 +1,16 @@
 from telegram.ext import (
     Updater,
-    CommandHandler,
-    MessageHandler,
-    Filters,
     CallbackContext,
 )
 import twint
 import html
 import re
+import os
 
 TOKEN = ""
 CHATID = 123
 oldtweetid = 123
+id_filename = "last_tweet_id.txt"
 
 def callbacktweet(context: CallbackContext):
     global oldtweetid
@@ -42,8 +41,15 @@ def callbacktweet(context: CallbackContext):
         else:
             context.bot.send_message(chat_id=CHATID, text=newtweet.tweet)
     oldtweetid = newtweet.id
+    with open(id_filename, "w+") as f:
+        f.write(oldtweetid)
 
 def main():
+    global oldtweetid, id_filename
+    if os.path.exists(id_filename):
+        with open(id_filename, "r") as f:
+            oldtweetid = f.read()
+
     upd = Updater(TOKEN, use_context=True)
     job = upd.job_queue
     job.run_repeating(callbacktweet, interval=60, first=1)
