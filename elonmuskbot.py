@@ -42,7 +42,7 @@ def callbacktweet(context: CallbackContext):
             context.bot.send_message(chat_id=CHATID, text=newtweet.tweet)
     oldtweetid = newtweet.id
     with open(id_filename, "w+") as f:
-        f.write(oldtweetid)
+        f.write(str(oldtweetid))
 
 def main():
     global oldtweetid, id_filename
